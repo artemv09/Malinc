@@ -41,5 +41,5 @@ if __name__ == "__main__":
                 print("Вы ввели не число. Попробуйте еще раз\n")
 
     finally:
-        GPIO.output(led, 0)
+        GPIO.output([16, 20, 21, 25, 26, 17, 27, 22], 0)
         GPIO.cleanup()
