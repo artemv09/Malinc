@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main() {  
     FILE *inputFile, *outputFile;
     char line[1024];
     char *inputFilename = "abc.txt";
