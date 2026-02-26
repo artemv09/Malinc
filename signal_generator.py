@@ -1,5 +1,5 @@
-import numpy
 import time 
+import numpy
 import math
 
 def get_sin_wave_amplitude(freq, time):
