@@ -7,7 +7,7 @@ class R2R_DAC:
         self.verbose = verbose
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.gpio_bits, GPIO.OUT, initial = 0)
+        GPIO.setup(self.gpio_bits, GPIO.OUT, initial = 1)
 
     def deinit(self):
         GPIO.putput(self.gpio_bits, 0)
@@ -30,13 +30,12 @@ class R2R_DAC:
 
 if __name__ == "__main__":
     try:
-        dac = R2R_DAC([16, 20, 21, 25, 26, 17, 27, 22], 3.183, True)
+        dac = R2R_DAC([26, 20, 19, 16, 13, 12, 25, 11], 3.183, True)
 
         while True:
             try:
                 voltage = float(input("Введите напряжение в вольтах: "))
-                dac.set_voltage(voltage)
-
+        
             except ValueError:
                 print("Вы ввели не число. Попробуйте еще раз\n")
 
