@@ -1,9 +1,10 @@
 import RPi.GPIO as GPIO
 import time
+import adc_plot 
 
 class R2R_ADC:
 
-    def __init__(self, dynamic_range, compare_time = 0.1, verbose = False):
+    def __init__(self, dynamic_range, compare_time = 0.0001, verbose = False):
         self.dynamic_range = dynamic_range
         self.verbose = verbose
         self.compare_time = compare_time
@@ -33,7 +34,7 @@ class R2R_ADC:
         while(self.right - self.left > 1):
             self.copy = (self.left + self.right) // 2
             self.number_to_dac(self.copy)
-            time.sleep(0.01)
+            time.sleep(0.0001)
             comparator_output = GPIO.input(self.comp_gpio)
 
 
@@ -52,18 +53,28 @@ class R2R_ADC:
         voltage = (digital_value / 255) * self.dynamic_range
         return voltage
  
-            
-        
 
 
 if __name__ == "__main__":
 
-    try:
-        dac = R2R_ADC(3.16, 0.01, False)
+    dac = R2R_ADC(3.16, 0.0001, False)
+    voltage_values = []
+    time_values = []
+    duration = 3.0
 
-        while True:
-            v = dac.get_sc_voltage()
-            print(f"напряжение = {v} в")
+    try:
+
+        start_time = time.time()
+
+        while (time.time() - start_time < duration):
+            voltage_values.append(dac.get_sc_voltage())
+            time_values.append(time.time() - start_time)
+
+
+        adc_plot.plot_voltage_vs_time(time_values, voltage_values, 3.3)
+        adc_plot.plot_sampling_period_hist(time_values)
+
+            
 
     finally:
         GPIO.output([26, 20, 19, 16, 13, 12, 25, 11], 0)

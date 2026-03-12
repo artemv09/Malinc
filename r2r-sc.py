@@ -7,36 +7,37 @@ class R2R_ADC:
         self.dynamic_range = dynamic_range
         self.verbose = verbose
         self.compare_time = compare_time
-        self.number = 0
 
         self.bits_gpio = [26, 20, 19, 16, 13, 12, 25, 11]
         self.comp_gpio = 21
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.bits_gpio, GPIO.OUT, initial = 0)
+        GPIO.setup(self.bits_gpio, GPIO.OUT, initial=0)
         GPIO.setup(self.comp_gpio, GPIO.IN)
+
+    def deinit(self):
+        GPIO.output(self.bits_gpio, 0)
+        GPIO.cleanup()
 
     def number_to_dac(self, number):
         a = [int(i) for i in bin(number)[2:].zfill(8)]
-        print(a)
         for i in range(len(a)):
             GPIO.output(self.bits_gpio[i], a[i])
 
-    def set_voltag(self):
-        print(f"напряжение {((self.number)/269*self.dynamic_range)}")
+    def sequential_counting_adc(self):
+        for dac_value in range(256):
+            self.number_to_dac(dac_value)
+            time.sleep(0.0001)
+            comparator_output = GPIO.input(self.comp_gpio)
+            if comparator_output == 1:
+                return dac_value
+        return 255
 
-        return ((self.number)/269*self.dynamic_range)
+    def get_sc_voltage(self):
+        digital_value = self.sequential_counting_adc()
+        voltage = (digital_value / 255) * self.dynamic_range
+        return voltage
 
-    def sequenttial_counting_adc(self):
-
-        self.numder = 0
-        while(GPIO.input(self.comp_gpio) != 1 and self.numder < 256):
-            self.number_to_dac(self.number)
-            self.number = self.number + 1
-            time.sleep(0.1)
-        self.set_voltag()
-        return self.number    
-            
         
 
 
@@ -49,12 +50,10 @@ if __name__ == "__main__":
 
     try:
 
-        dac = R2R_ADC(3.16, 0.0001, False)
-
         start_time = time.time()
 
         while (time.time() - start_time < duration):
-            voltage_values.append(dac.set_voltag())
+            voltage_values.append(dac.get_sc_voltage())
             time_values.append(time.time() - start_time)
 
 
